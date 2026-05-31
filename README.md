@@ -10,7 +10,7 @@ This is a [Metalsmith](http://www.metalsmith.io/) plugin to generate a sitemap f
 Install the package:
 
 ```
-npm install https://github.com/borisovg/metalsmith-sitemap
+npm install borisovg/metalsmith-sitemap#v1.0.0
 ```
 
 Add the plugin to your Metalsmith build chain:
