@@ -31,8 +31,6 @@
     "noFallthroughCasesInSwitch": true,
     "noPropertyAccessFromIndexSignature": true,
 
-    "importHelpers": true,
-
     // Recommended Options
     "strict": true,
     "jsx": "react-jsx",
