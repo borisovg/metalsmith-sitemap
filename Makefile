@@ -57,3 +57,12 @@ test-watch: node_modules
 
 $(NPM_LOCK):
 	$(NPM) install && touch $@
+
+.PHONY: release
+release: test dist
+ifndef TYPE
+	$(error TYPE is not set - use TYPE=patch|minor|major)
+endif
+	$(NPM) version $(TYPE) -m "Release %s"
+	git push --tags
+release:
