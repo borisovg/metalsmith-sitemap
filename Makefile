@@ -29,7 +29,7 @@ dist: node_modules $(TS_FILES) $(TS_CONFIGS) Makefile
 ## lint:		run linter checks
 .PHONY: lint
 lint: node_modules
-	$(NPM_BIN)/biome check --write --error-on-warnings
+	$(NPM_BIN)/biome check --write --error-on-warnings ./src
 
 node_modules: package.json $(NPM_LOCK)
 	$(NPM) install || (rm -rf $@; exit 1)
