@@ -5,6 +5,19 @@
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
+  "author": {
+    "name": "George Borisov",
+    "url": "https://github.com/borisovg"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/borisovg/metalsmith-sitemap.git"
+  },
+  "bugs": {
+    "url": "https://github.com/borisovg/metalsmith-sitemap"
+  },
+  "homepage": "https://github.com/borisovg/metalsmith-sitemap#readme",
   "scripts": {
     "lint": "make lint",
     "prepublishOnly": "make",
