@@ -1,5 +1,5 @@
 [![Tests](https://github.com/borisovg/metalsmith-sitemap/actions/workflows/tests.yaml/badge.svg)](https://github.com/borisovg/metalsmith-sitemap/actions/workflows/tests.yaml)
-[![Coverage Status](https://img.shields.io/codecov/c/github/borisovg/metalsmith-sitemap/master.svg?style=flat-square)](https://codecov.io/gh/borisovg/metalsmith-sitemap/)
+[![Coverage Status](https://img.shields.io/codecov/c/github/borisovg/metalsmith-sitemap/main.svg?style=flat-square)](https://codecov.io/gh/borisovg/metalsmith-sitemap/)
 
 # @borisovg/metalsmith-sitemap
 
