@@ -1,8 +1,27 @@
 import path from "node:path";
 import { Readable } from "node:stream";
+import debug from "debug";
 import type Metalsmith from "metalsmith";
 import { type SitemapItemLoose, SitemapStream, streamToPromise } from "sitemap";
-import type { File, Files, FilterFn, SitemapPluginOptions } from "./types.js";
+
+export type SitemapPluginFilter = (
+  path: string,
+  file: Metalsmith.File,
+) => boolean;
+
+export type SitemapPluginOptions = {
+  createdAtKey?: string;
+  filter?: SitemapPluginFilter;
+  outputPath?: string;
+  hostname: string;
+  priorityKey?: string;
+  privateKey?: string;
+  updatedAtKey?: string;
+};
+
+const logFormatDate = debug("metalsmith-sitemap:debug:formatDate");
+const logMakeSitemapInput = debug("metalsmith-sitemap:debug:makeSitemapInput");
+const logNormalisedOpts = debug("metalsmith-sitemap:debug:normaliseOpts");
 
 export default function makeSitemapPlugin(opts: SitemapPluginOptions) {
   const normalisedOpts = normaliseOpts(opts);
@@ -34,12 +53,16 @@ export default function makeSitemapPlugin(opts: SitemapPluginOptions) {
   }) as Metalsmith.Plugin;
 }
 
-function filterFiles(files: Files, filter: FilterFn, privateKey: string) {
+function filterFiles(
+  files: Metalsmith.Files,
+  filter: SitemapPluginFilter,
+  privateKey: string,
+) {
   const input = Object.entries(files);
-  const output: Map<string, Files[number]> = new Map();
+  const output: Map<string, Metalsmith.Files[number]> = new Map();
 
   for (const [path, file] of input) {
-    if (!file.frontmatter?.[privateKey] && filter(path, file)) {
+    if (!file[privateKey] && filter(path, file)) {
       output.set(path, file);
     }
   }
@@ -49,21 +72,24 @@ function filterFiles(files: Files, filter: FilterFn, privateKey: string) {
 
 function formatDate(dateString: string) {
   const date = new Date(dateString);
+  let output: string | undefined;
 
   if (!Number.isNaN(date.getTime())) {
     const year = date.getUTCFullYear();
     const month = String(date.getUTCMonth() + 1).padStart(2, "0");
     const day = String(date.getUTCDate()).padStart(2, "0");
 
-    return `${year}-${month}-${day}`;
+    output = `${year}-${month}-${day}`;
   }
+
+  logFormatDate(`INPUT: ${dateString}, OUTPUT: ${output}`);
+  return output;
 }
 
 function normaliseOpts(opts: SitemapPluginOptions) {
   const normalisedOpts: Required<SitemapPluginOptions> = {
     createdAtKey: "date",
-    filter: (path: string, file: File) =>
-      !file.frontmatter?.[normalisedOpts.privateKey] && path.endsWith(".html"),
+    filter: (path: string, _file) => path.endsWith(".html"),
     outputPath: "sitemap.xml",
     priorityKey: "priority",
     privateKey: "private",
@@ -71,13 +97,19 @@ function normaliseOpts(opts: SitemapPluginOptions) {
     ...opts,
   };
 
-  normalisedOpts.filter ??= (path: string, _file) => path.endsWith(".html");
+  logNormalisedOpts(
+    JSON.stringify(
+      { ...normalisedOpts, filter: normalisedOpts.filter.toString() },
+      undefined,
+      2,
+    ),
+  );
 
   return normalisedOpts;
 }
 
 function makeSitemapInput(
-  input: Map<string, File>,
+  input: Map<string, Metalsmith.File>,
   opts: Required<SitemapPluginOptions>,
 ) {
   const list: SitemapItemLoose[] = [];
@@ -86,15 +118,15 @@ function makeSitemapInput(
     const item: SitemapItemLoose = {
       url: safeJoinUrlPath("/", path),
     };
-    const udpatedAt =
-      file.frontmatter?.[opts.updatedAtKey] ||
-      file.frontmatter?.[opts.createdAtKey];
+    const updatedAt = (file[opts.updatedAtKey] || file[opts.createdAtKey]) as
+      | string
+      | undefined;
     const priority = Number.parseFloat(
-      file.frontmatter?.[opts.priorityKey] || "",
+      (file[opts.priorityKey] || "") as string,
     );
 
-    if (udpatedAt) {
-      const lastmod = formatDate(udpatedAt);
+    if (updatedAt) {
+      const lastmod = formatDate(updatedAt);
       if (lastmod) {
         item.lastmod = lastmod;
       }
@@ -105,6 +137,24 @@ function makeSitemapInput(
     }
 
     list.push(item);
+
+    logMakeSitemapInput(
+      JSON.stringify(
+        {
+          path,
+          file: {
+            title: file["title"],
+            [opts.createdAtKey]: file[opts.createdAtKey],
+            [opts.priorityKey]: file[opts.priorityKey],
+            [opts.privateKey]: file[opts.privateKey],
+            [opts.updatedAtKey]: file[opts.updatedAtKey],
+          },
+          item,
+        },
+        undefined,
+        2,
+      ),
+    );
   }
 
   return list;

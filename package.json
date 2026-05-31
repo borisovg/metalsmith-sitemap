@@ -13,10 +13,12 @@
     "test:watch": "make test-watch"
   },
   "dependencies": {
+    "debug": "^4.4.3",
     "sitemap": "^9.0.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^2",
+    "@types/debug": "^4.1.13",
     "@types/node": "^25",
     "@vitest/coverage-v8": "^4",
     "metalsmith": "^2.7.0",

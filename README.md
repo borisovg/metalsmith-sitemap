@@ -43,3 +43,11 @@ metalsmith(import.meta.dirname)
 | priorityKey  | `string`                                | "priority"                       | Used to set priority via frontmatter metadata variable.                                  |
 | privateKey   | `string`                                | "private"                        | Used to exclude file from sitemap via frontmatter metadata variable.                     |
 | updatedAtKey | `string`                                | "lastmod"                        | Used to set "lastmod" value via frontmatter metadata variable.                           |
+
+## Debug Logging
+
+Set the DEBUG variable to see what the plugin is doing.
+
+```
+DEBUG=metalsmith-sitemap:* node build.js
+```

@@ -1,6 +1,10 @@
 import path from "node:path";
 import { Readable } from "node:stream";
+import debug from "debug";
 import { SitemapStream, streamToPromise } from "sitemap";
+const logFormatDate = debug("metalsmith-sitemap:debug:formatDate");
+const logMakeSitemapInput = debug("metalsmith-sitemap:debug:makeSitemapInput");
+const logNormalisedOpts = debug("metalsmith-sitemap:debug:normaliseOpts");
 export default function makeSitemapPlugin(opts) {
     const normalisedOpts = normaliseOpts(opts);
     return ((files, _metalsmith, done) => {
@@ -28,7 +32,7 @@ function filterFiles(files, filter, privateKey) {
     const input = Object.entries(files);
     const output = new Map();
     for (const [path, file] of input) {
-        if (!file.frontmatter?.[privateKey] && filter(path, file)) {
+        if (!file[privateKey] && filter(path, file)) {
             output.set(path, file);
         }
     }
@@ -36,24 +40,27 @@ function filterFiles(files, filter, privateKey) {
 }
 function formatDate(dateString) {
     const date = new Date(dateString);
+    let output;
     if (!Number.isNaN(date.getTime())) {
         const year = date.getUTCFullYear();
         const month = String(date.getUTCMonth() + 1).padStart(2, "0");
         const day = String(date.getUTCDate()).padStart(2, "0");
-        return `${year}-${month}-${day}`;
+        output = `${year}-${month}-${day}`;
     }
+    logFormatDate(`INPUT: ${dateString}, OUTPUT: ${output}`);
+    return output;
 }
 function normaliseOpts(opts) {
     const normalisedOpts = {
         createdAtKey: "date",
-        filter: (path, file) => !file.frontmatter?.[normalisedOpts.privateKey] && path.endsWith(".html"),
+        filter: (path, _file) => path.endsWith(".html"),
         outputPath: "sitemap.xml",
         priorityKey: "priority",
         privateKey: "private",
         updatedAtKey: "lastmod",
         ...opts,
     };
-    normalisedOpts.filter ??= (path, _file) => path.endsWith(".html");
+    logNormalisedOpts(JSON.stringify({ ...normalisedOpts, filter: normalisedOpts.filter.toString() }, undefined, 2));
     return normalisedOpts;
 }
 function makeSitemapInput(input, opts) {
@@ -62,11 +69,10 @@ function makeSitemapInput(input, opts) {
         const item = {
             url: safeJoinUrlPath("/", path),
         };
-        const udpatedAt = file.frontmatter?.[opts.updatedAtKey] ||
-            file.frontmatter?.[opts.createdAtKey];
-        const priority = Number.parseFloat(file.frontmatter?.[opts.priorityKey] || "");
-        if (udpatedAt) {
-            const lastmod = formatDate(udpatedAt);
+        const updatedAt = (file[opts.updatedAtKey] || file[opts.createdAtKey]);
+        const priority = Number.parseFloat((file[opts.priorityKey] || ""));
+        if (updatedAt) {
+            const lastmod = formatDate(updatedAt);
             if (lastmod) {
                 item.lastmod = lastmod;
             }
@@ -75,6 +81,17 @@ function makeSitemapInput(input, opts) {
             item.priority = priority;
         }
         list.push(item);
+        logMakeSitemapInput(JSON.stringify({
+            path,
+            file: {
+                title: file["title"],
+                [opts.createdAtKey]: file[opts.createdAtKey],
+                [opts.priorityKey]: file[opts.priorityKey],
+                [opts.privateKey]: file[opts.privateKey],
+                [opts.updatedAtKey]: file[opts.updatedAtKey],
+            },
+            item,
+        }, undefined, 2));
     }
     return list;
 }

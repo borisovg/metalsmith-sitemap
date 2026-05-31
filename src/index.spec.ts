@@ -2,11 +2,10 @@ import { promisify } from "node:util";
 import type Metalsmith from "metalsmith";
 import { describe, expect, it } from "vitest";
 import sitemapPlugin from "./index.js";
-import type { Files } from "./types.js";
 
 describe("index", () => {
   it("generates sitemap", async () => {
-    const files: Files = {
+    const files: Metalsmith.Files = {
       "foo.html": { contents: Buffer.from("") },
       "bar/baz.html": { contents: Buffer.from("") },
     };
@@ -24,7 +23,7 @@ describe("index", () => {
   });
 
   it("generates sitemap with custom outputPath", async () => {
-    const files: Files = {
+    const files: Metalsmith.Files = {
       "foo.html": { contents: Buffer.from("") },
     };
 
@@ -41,7 +40,7 @@ describe("index", () => {
 
   it("default filter skips files marked as private", async () => {
     const files: Metalsmith.Files = {
-      "foo.html": { contents: Buffer.from(""), frontmatter: { private: true } },
+      "foo.html": { contents: Buffer.from(""), private: true },
       "bar/baz.html": { contents: Buffer.from("") },
     };
 
@@ -59,7 +58,7 @@ describe("index", () => {
 
   it("default filter skips files marked as private with custom privateKey", async () => {
     const files: Metalsmith.Files = {
-      "foo.html": { contents: Buffer.from(""), frontmatter: { secret: true } },
+      "foo.html": { contents: Buffer.from(""), secret: true },
       "bar/baz.html": { contents: Buffer.from("") },
     };
 
@@ -78,22 +77,16 @@ describe("index", () => {
     const files: Metalsmith.Files = {
       "foo.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          date: new Date("2026-04-01").toISOString(),
-          lastmod: "2026-05-01",
-        },
+        date: new Date("2026-04-01").toISOString(),
+        lastmod: "2026-05-01",
       },
       "bar.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          date: "invalid",
-        },
+        date: "invalid",
       },
       "bar/baz.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          date: new Date("2026-05-01").toISOString(),
-        },
+        date: new Date("2026-05-01").toISOString(),
       },
     };
 
@@ -113,16 +106,12 @@ describe("index", () => {
     const files: Metalsmith.Files = {
       "foo.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          createdAt: new Date("2026-04-01").toISOString(),
-          updatedAt: "2026-05-01",
-        },
+        createdAt: new Date("2026-04-01").toISOString(),
+        updatedAt: "2026-05-01",
       },
       "bar/baz.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          createdAt: new Date("2026-05-01").toISOString(),
-        },
+        createdAt: new Date("2026-05-01").toISOString(),
       },
     };
 
@@ -145,15 +134,11 @@ describe("index", () => {
     const files: Metalsmith.Files = {
       "foo.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          priority: 0.5,
-        },
+        priority: 0.5,
       },
       "bar.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          priority: "invalid",
-        },
+        priority: "invalid",
       },
     };
 
@@ -174,9 +159,7 @@ describe("index", () => {
     const files: Metalsmith.Files = {
       "foo.html": {
         contents: Buffer.from(""),
-        frontmatter: {
-          importance: 0.5,
-        },
+        importance: 0.5,
       },
     };
 

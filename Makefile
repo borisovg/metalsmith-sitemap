@@ -64,5 +64,6 @@ ifndef TYPE
 	$(error TYPE is not set - use TYPE=patch|minor|major)
 endif
 	$(NPM) version $(TYPE) -m "Release %s"
+	git push
 	git push --tags
 release:
