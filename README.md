@@ -10,7 +10,7 @@ This is a [Metalsmith](http://www.metalsmith.io/) plugin to generate a sitemap f
 Install the package:
 
 ```
-npm install @borisovg/metalsmith-sitemap
+npm install https://github.com/borisovg/metalsmith-sitemap
 ```
 
 Add the plugin to your Metalsmith build chain:
@@ -39,7 +39,7 @@ metalsmith(import.meta.dirname)
 | hostname     | `string` **(required)**                 |                                  | Used to set the URL prefix for each link in the sitemap.                                 |
 | createdAtKey | `string`                                | "date"                           | Used as a fallback to set "lastmod" value if frontmatter at "updatedAtKey" is undefined. |
 | filter       | `(name: string, file: File) => boolean` | (path) => path.endsWith(".html") | Used to filter files to be included in the sitemap.                                      |
-| outputPath   | `string`                                | "sitemap.xml"                    | Used to set the output file.                                                             |
+| outputPath   | `string`                                | "sitemap.xml"                    | Used to set the output file path.                                                        |
 | priorityKey  | `string`                                | "priority"                       | Used to set priority via frontmatter metadata variable.                                  |
 | privateKey   | `string`                                | "private"                        | Used to exclude file from sitemap via frontmatter metadata variable.                     |
 | updatedAtKey | `string`                                | "lastmod"                        | Used to set "lastmod" value via frontmatter metadata variable.                           |
