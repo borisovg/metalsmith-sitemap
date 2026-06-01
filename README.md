@@ -5,6 +5,8 @@
 
 This is a [Metalsmith](http://www.metalsmith.io/) plugin to generate a sitemap file.
 
+The plugin itself is a thin wrapper around the [sitemap.js](https://github.com/ekalinin/sitemap.js) library.
+
 ## Usage
 
 Install the package:
